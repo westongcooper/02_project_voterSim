@@ -1,11 +1,15 @@
 # 02_project_methods.rb
 Loadtime = 1.5
+# ," "*(15-voter.lName.length)
+def displayNamesInOrder(voter)
+	print voter.lName,", ", voter.fName," "*(23-voter.Name.length),"| ",voter.Side," "*(20-voter.Side.length),"| ",voter.State," "*(20-voter.State.length),"| ",voter.voterType," "*(20-voter.voterType.length),"\n"
+end
 def question(question,stay = nil)
 	puts `clear` if ! stay
 	options = question.scan(/'([^']*)'/).flatten
 	begin
 		answer = ""
-		puts question
+		puts question,"\n"
 		answer = gets.chomp.downcase.capitalize while answer.empty?
 		if options.include? answer
 			return answer
@@ -49,4 +53,7 @@ def enterToContinue
 			puts "\n\nPress enter to return to continue"
 			continue = gets.chomp
 		end until continue
+end
+def states
+statesList = "'Alabama''Alaska''Arizona''Arkansas''California'\n'Colorado''Connecticut''Delaware''District of Columbia''Florida'\n'Georgia''Hawaii''Idaho''Illinois''Indiana''Iowa''Kansas''Kentucky'\n'Louisiana''Maine''Montana''Nebraska''Nevada''New Hampshire'\n'New Jersey''New Mexico''New York''North Carolina''North Dakota''Ohio'\n'Oklahoma''Oregon''Maryland''Massachusetts''Michigan''Minnesota'\n'Mississippi''Missouri''Pennsylvania''Rhode Island''South Carolina'\n'South Dakota''Tennessee''Texas''Utah''Vermont''Virginia''Washington'\n'West Virginia''Wisconsin''Wyoming'"
 end

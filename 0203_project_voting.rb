@@ -1,12 +1,15 @@
 # 0203_project_voting.rb
 
 require "./02_project_methods"
+require "./02_project_voters"
 
 
 class System
 	attr_accessor :voterList
-	@@voterList = []
 	def initialize
+		@voterList = []
+		add_people if question("Do you want to auto load voters? 'Y' or 'N'") == "Y"
+		add_politicians if question("Do you want to auto load politicians? 'Y' or 'N'") == "Y"
 		menu
 	end
 	def menu
@@ -17,9 +20,10 @@ class System
 				displayConfirmation
 			when "List"
 				list
-				endterToContinue
+				enterToContinue
+				menu
 			when "Update"
-				update
+				updateWhat
 				displayConfirmation
 			when "Vote"
 		end
@@ -36,11 +40,10 @@ class System
 	def add_Someone(string,type)
 		name = get_Name(type)
 		side = question(string)
-		p type.new(name[0],name[1],side)
-		#p self.Politician.PoliticianList
+		state = question("What state is this voter? \n\n#{states}")
+		@voterList << type.new(name[0],name[1],side,state)
 	end
 	def get_Name(type)
-		p "get name"
 		correct = nil
 		until correct == 'Y'
 			fName = openQuestion("What is the first name of the #{type}.")
@@ -50,41 +53,49 @@ class System
 		[fName,lName]
 	end
 	def addVoter (voter)
-		@@voterList << voter
+		@voterList << voter
 	end
-	def list
-		puts `clear`
-		@@voterList.each do |voter|
-			print "#{voter.voterType}, #{voter.Name}, #{voter.Side}\n"
+	def list(sortLastName = nil)
+		puts `clear`,"\n"*3
+		sortBy = question("How would you like to sort your voter list? 'Name', 'State', or political 'Side'") #unless sortLastName
+		case sortBy
+		when 'Name'
+			@voterList.sort! { |a,b| a.lName.downcase <=> b.lName.downcase }
+		when 'State'
+			@voterList.sort! { |a,b| a.State.downcase <=> b.State.downcase }
+		when 'Side'
+			@voterList.sort! { |a,b| a.Side.downcase <=> b.Side.downcase }
+		end
+		puts "Last Name, First Name   | Voter Side          | Voter State         | Voter Type","="*86
+		@voterList.each do |voter|
+			displayNamesInOrder(voter)
 		end
 	end
 	def updateWhat
 		puts `clear`
-		list
+		list('Name')
 		puts "\n\n"
 		match = nil
 		begin
-			name = openQuestion("Who do you want to change?","stay")
-			@@voterList.each_with_index do |voter,index| 
+			name = openQuestion("Who do you want to change? Give me 'First Name' 'Last Name'","stay").strip.squeeze(" ")
+			@voterList.each_with_index do |voter,index| 
 				match = index if name == voter.Name.downcase.capitalize
 			end
 			puts "\n\nThat name was not found.\n\n" if !match
 		end until match
-		voter = @@voterList[match]
-		puts `clear`,"\n\n#{voter.Name} - #{voter.Side}\n\n"
-		what = question("What do you want to change? 'Name' or 'Political side'?","stay")
+		voter = @voterList[match]
+		puts `clear`,"\n\n#{voter.Name} - #{voter.Side} - #{voter.State}\n\n"
+		what = question("What do you want to change? 'Name', 'Political side', or 'State'?","stay")
 		updateNow(voter,what)
 	end
 	def updateNow(voter,what)
-		p voter
 		case what
 		when "Name"
 			changeName(voter)
-			# @@voterList[match].Name = getName(voterType)
-			# @@voterList[match] = change
 		when "Political side"
-			voter.changeViews
-			p @@voterList
+			voter.changeViews#(voter)
+		when "State"
+			voter.State = question("What state is this voter? \n\n#{states}")
 		end
 	end
 	def changeName(voter)
@@ -100,25 +111,22 @@ class System
 	end
 end
 
-class Voter
-
-end
 class Politician < System
-	attr_accessor :voterType,:fName,:lName, :Side, :Name,:PoliticianList
+	attr_accessor :voterType,:fName,:lName, :Side, :Name,:State,:PoliticianList
 	@@PoliticianList = []
-	def initialize(fName,lName,side)
+	def initialize(fName,lName,side,state)
 		@voterType = "Politician"
 		@fName = fName
 		@lName = lName
 		@Name = "#{fName} #{lName}"
 		@Side = side
+		@State = state
 		puts "\n"*3,"Adding #{@Name} as Politician as a #{@Side}"
 		# p self
 		@@PoliticianList << self
-		addVoter(self)
 	end
-	def changeSide
-
+	def changeViews#(person)
+		@Side = question("What political side are campainging for? 'Republican' or 'Democrat'")
 	end
 	# def inspect
 	# 	@Name
@@ -129,21 +137,20 @@ class Politician < System
 end
 
 class Person < System
-	attr_accessor :voterType,:fName,:lName, :Side,:Name,:PeopleList
+	attr_accessor :voterType,:fName,:lName, :Side,:Name,:State,:PeopleList
 	@@PeopleList = []
-	def initialize(fName,lName,side)
+	def initialize(fName,lName,side,state)
 		@voterType = "Person"
 		@fName = fName
 		@lName = lName
 		@Name = "#{fName} #{lName}"
 		@Side = side
+		@State = state
 		puts "\n"*3,"Adding #{@Name} as person with #{@Side} views"
 		@@PeopleList << self
-		addVoter(self)
 	end
-	def changeViews
+	def changeViews#(person)
 		@Side = question("What political side are your views? 'Liberal', 'Conservative', 'Tea party', 'Socialist', or 'Neutral'")
-		p @@PeopleList
 	end
 	# def inspect
 	# 	@Name
@@ -152,15 +159,13 @@ class Person < System
 	# 	@Name
 	# end
 end
-# class Liberal < Person
-# end
-# class Conservative < Person
-# end
-# class Tea_Party < Person
-# end
-# class Socialist < Person
-# end
-# class Neutral < Person
+
+# require 'minitest/autorun'
+
+# class TestVoterSim < Minitest::Test
+# 	def test_votersim
+# 		campaign = System.new
+# 	end
 # end
 
 def test
