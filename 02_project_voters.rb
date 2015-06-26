@@ -1,5 +1,5 @@
 # 02_project_voters.rb
-
+ 
 def add_people
 	people = []
 	people << "Keith,Kelley,Liberal,Arizona".split(",")

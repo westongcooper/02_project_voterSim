@@ -26,6 +26,7 @@ class System
 				updateWhat
 				displayConfirmation
 			when "Vote"
+				beginVote
 		end
 	end
 	def create
@@ -57,7 +58,7 @@ class System
 	end
 	def list(sortLastName = nil)
 		puts `clear`,"\n"*3
-		sortBy = question("How would you like to sort your voter list? 'Name', 'State', or political 'Side'") #unless sortLastName
+		sortBy = question("How would you like to sort your voter list? 'Name', 'State', or political 'Side'") unless sortLastName
 		case sortBy
 		when 'Name'
 			@voterList.sort! { |a,b| a.lName.downcase <=> b.lName.downcase }
@@ -93,7 +94,7 @@ class System
 		when "Name"
 			changeName(voter)
 		when "Political side"
-			voter.changeViews#(voter)
+			voter.changeViews
 		when "State"
 			voter.State = question("What state is this voter? \n\n#{states}")
 		end
@@ -107,7 +108,10 @@ class System
 	#def changeSide(voter)
 	#	voter.changeSide
 	#end
-	def Vote
+	def beginVote
+		p Politician.getPoliticians
+		puts "\n\n"
+		p Person.getPeople
 	end
 end
 
@@ -128,6 +132,10 @@ class Politician < System
 	def changeViews#(person)
 		@Side = question("What political side are campainging for? 'Republican' or 'Democrat'")
 	end
+	def self.getPoliticians
+		@@PoliticianList
+	end
+
 	# def inspect
 	# 	@Name
 	# end
@@ -152,6 +160,9 @@ class Person < System
 	def changeViews#(person)
 		@Side = question("What political side are your views? 'Liberal', 'Conservative', 'Tea party', 'Socialist', or 'Neutral'")
 	end
+	def self.getPeople
+		@@PeopleList
+	end
 	# def inspect
 	# 	@Name
 	# end
@@ -168,9 +179,9 @@ end
 # 	end
 # end
 
-def test
-#politicians = Politician.new
-#people = Person.new
 campaign = System.new
-end
-test
+
+
+
+
+

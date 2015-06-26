@@ -6,7 +6,7 @@ def displayNamesInOrder(voter)
 end
 def question(question,stay = nil)
 	puts `clear` if ! stay
-	options = question.scan(/'([^']*)'/).flatten
+	options = question.scan(/'([^']*)'/).flatten 
 	begin
 		answer = ""
 		puts question,"\n"
