@@ -70,8 +70,8 @@ def enterToContinue
 		end until continue
 end
 
-def states
-	statesList = "'Alabama''Alaska''Arizona''Arkansas''California'\n'Colorado''Connecticut''Delaware''District of Columbia''Florida'\n'Georgia''Hawaii''Idaho''Illinois''Indiana''Iowa''Kansas''Kentucky'\n'Louisiana''Maine''Montana''Nebraska''Nevada''New Hampshire'\n'New Jersey''New Mexico''New York''North Carolina''North Dakota''Ohio'\n'Oklahoma''Oregon''Maryland''Massachusetts''Michigan''Minnesota'\n'Mississippi''Missouri''Pennsylvania''Rhode Island''South Carolina'\n'South Dakota''Tennessee''Texas''Utah''Vermont''Virginia''Washington'\n'West Virginia''Wisconsin''Wyoming'"
+def statesList
+	statesList = 	"'Alabama''Alaska''Arizona''Arkansas''California'\n'Colorado''Connecticut''Delaware''District of columbia''Florida'\n'Georgia''Hawaii''Idaho''Illinois''Indiana''Iowa''Kansas''Kentucky'\n'Louisiana''Maine''Montana''Nebraska''Nevada''New hampshire'\n'New jersey''New ,mexico''New york''North carolina''North dakota''Ohio'\n'Oklahoma''Oregon''Maryland''Massachusetts''Michigan''Minnesota'\n'Mississippi''Missouri''Pennsylvania''Rhode island''South carolina'\n'South Dakota''Tennessee''Texas''Utah''Vermont''Virginia''Washington'\n'West virginia''Wisconsin''Wyoming'"
 end
 
 

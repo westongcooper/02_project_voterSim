@@ -12,50 +12,55 @@ class System
 		@votes = []
 		@republicanVote= []
 		@democratVote = []
-		if question("Do you want to auto load voters? 'Y' or 'N'") == "Y"
-			gen_people(openNumberQuestion("How many? (200,000 max)",200_000))
+		if question("Do you want to auto load voters? 'Y' or 'N'") == "Y"#question is a method that returns only whatever is in single quotes when it is typed
+			gen_people(openNumberQuestion("How many? (200,000 max)",200_000))#Gen_people is a method auto generate people for campagin and openNumberQuestion returns a only a number when it is typed.
 		end
 		if question("Do you want to auto load politicians? 'Y' or 'N'") == "Y"
-			gen_politicians(openNumberQuestion("How many? (50 max)",50))
+			gen_politicians(openNumberQuestion("How many? (50 max)",50))#generates politicians for voting system
 		end
 		menu
 	end
+
 	def menu
-		task = question("What would you like to do? 'Create', 'List', 'Update', or 'Vote'")
+		task = question("What would you like to do? 'Create', 'List', 'Update', 'Vote',or 'Exit'")
 		case task
 			when "Create"
-				create
-				displayConfirmation
+				create #method to start creating a Politician or Person
+				displayConfirmation #show that create is finished and return to menu
 			when "List"
-				list
-				enterToContinue
+				list #ask how list should be displayed and shows list
+				enterToContinue #prompt to return to menu
 				menu
 			when "Update"
-				updateWhat
+				updateWhat #method to start the update process
 				displayConfirmation
 			when "Vote"
-				beginPrimary
-				beginVote
+				beginPrimary #method to determine who is representing Democrats and Republicans
+				beginVote #method to determine if Democrat or Republican wins
 				enterToContinue
 				menu
+			when "Exit"
 		end
 	end
-	def create
-		create = question("What would you like to create? 'Polit', or 'Person'")
+
+	def create #ask if you want to create a Politican or Person
+		create = question("What would you like to create? 'Politician', or 'Person'")
 		case create
-			when "Polit"
+			when "Politician" #add_someone creates a specific class of type Person or Politician
 				add_Someone("What political side is this politician? 'Democrat', or 'Republican'",Politician)
 			when "Person"
 				add_Someone("What political side are your views? 'Liberal', 'Conservative', 'Tea party', 'Socialist', or 'Neutral'",Person)
 		end
 	end
+
 	def add_Someone(string,type)
-		name = get_Name(type)
-		side = question(string)
-		state = question("What state is this voter? \n\n#{states}")
-		@voterList << type.new(name[0],name[1],side,state)
+		name = get_Name(type) #get_Name is a method that returns an array of [FirstName,LastName]
+		side = question(string) #Calls the question method with a string for a Politician or Person 
+		state = question("What state is this voter? \n\n#{statesList}") #returns a state from the stateList
+		@voterList << type.new(name[0],name[1],side,state) #creates a new class of Type Politican or Person and passes it to the @voterList
 	end
-	def get_Name(type)
+
+	def get_Name(type) #method to ask the name and returns an array of first name and last name.
 		correct = nil
 		until correct == 'Y'
 			fName = openQuestion("What is the first name of the #{type}.")
@@ -64,18 +69,28 @@ class System
 		end
 		[fName,lName]
 	end
-	def addVoter (voter)
-		@voterList << voter
-	end
-	def list(sortLastName = nil,sortBy = 'Name')
+
+	def list(sortLastName = nil,sortBy = 'Name')#By default asks how to sort.  When passed sortLastName it skips the question and sorts by Name
 		puts `clear`,"\n"*3
 		sortBy = question("How would you like to sort your voter list? 'Name', 'State', or political 'Side'") unless sortLastName
-		@voterList.sort! { |a,b| a.sortList(sortBy).downcase <=> b.sortList(sortBy).downcase }
+		@voterList.sort! { |a,b| a.sortList(sortBy).downcase <=> b.sortList(sortBy).downcase } #sorts list based of sortBy question
 		puts "Last Name, First Name   | Voter Side          | Voter State         | Voter Type","="*86
-		@voterList.each do |voter|
+		@voterList.each do |voter|#calls method to display names
 			displayNamesInOrder(voter)
 		end
 	end
+
+	def sortList(sortBy)
+		case sortBy
+		when 'Name'
+			@lName
+		when 'State'
+			@State
+		when 'Side'
+			@Side
+		end
+	end
+
 	def updateWhat
 		puts `clear`
 		list('Name')
@@ -93,6 +108,7 @@ class System
 		what = question("What do you want to change? 'Name', 'Political side', or 'State'?","stay")
 		updateNow(voter,what)
 	end
+
 	def updateNow(voter,what)
 		case what
 		when "Name"
@@ -100,15 +116,17 @@ class System
 		when "Political side"
 			voter.changeViews
 		when "State"
-			voter.State = question("What state is this voter? \n\n#{states}")
+			voter.State = question("What state is this voter? \n\n#{statesList}")
 		end
 	end
+
 	def changeName(voter)
 		name = get_Name(voter.voterType)
 		voter.fName = name[0]
 		voter.lName = name[1]
 		voter.Name = "#{name[0]} #{name[1]}"
 	end
+
 	def beginPrimary
 		puts "-"*55
 		puts "-"*55
@@ -151,21 +169,13 @@ class System
 		puts "\nDemocrat primary Winner: #{@democratPrimaryWinner}\n"
 		puts "\nRepublican primary Winner: #{@republicanPrimaryWinner}\n"
 	end
+
 	def beginVote
 		@votes = []
 		@voterList.each { |voter| getVotes(voter)}
 		tallyVotes
 	end
-	def sortList(sortBy)
-		case sortBy
-		when 'Name'
-			@lName
-		when 'State'
-			@State
-		when 'Side'
-			@Side
-		end
-	end
+
 	def getVotes (voter)
 		case voter.Side 
 		when 'Liberal'
@@ -184,6 +194,7 @@ class System
 			addVoter(voter.State,0)
 		end
 	end
+
 	def addVoter(state,percent)
 
 		if rand(100) < percent 
@@ -192,6 +203,7 @@ class System
 			@votes << ['Democrat',state]
 		end
 	end
+
 	def tallyVotes
 		@republicanVote = []
 		@democratVote = []
@@ -246,6 +258,7 @@ class System
 		puts "-"*55
 
 	end
+
 	def tallyElectorials(states)
 		electorialCount = 0
 		states.each {|state|
@@ -308,17 +321,10 @@ class Person < System
 	end
 end
 
-# require 'minitest/autorun'
-
-# class TestVoterSim < Minitest::Test
-# 	def test_votersim
-# 		campaign = System.new
-# 	end
-# end
-
+begin #Loop to restart campaign if you want
 campaign = System.new
-
-
+again = question("Do you want to start a new campagin? 'Y' or 'N'")
+end until again == 'N'
 
 
 
