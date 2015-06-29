@@ -110,6 +110,8 @@ class System
 		voter.Name = "#{name[0]} #{name[1]}"
 	end
 	def beginPrimary
+		puts "-"*55
+		puts "-"*55
 		@democratCandidates = []
 		@republicanCandidates = []
 		@democratPrimaryVotes = []
@@ -215,10 +217,12 @@ class System
 		}
 		puts "-"*55
 		puts "Democrat Party wins the Electorial Votes for these states:"
+		puts "-"*20
 		democratWinners.each {|state|
 			puts state
 		}
 		puts "\nRepublican Party wins the Electorial Votes for these states:"
+		puts "-"*20
 		republicanWinners.each {|state|
 			puts state
 		}
@@ -235,8 +239,11 @@ class System
 		end
 		puts "-"*55
 		puts "\nRepublican = #{@republicanVote.length} votes", "Democrat  = #{@democratVote.length} votes\n"
-		print @republicanVote.length > @democratVote.length ? "Republican" : "Democrat"," party are the Winners of the popular vote!\n\n"
+		print @republicanVote.length > @democratVote.length ? "Republican" : "Democrat"," party wins the popular vote!\n\n"
+		puts "-"*55
 		puts "#{@winner} is the winner of the election!"
+		puts "-"*55
+		puts "-"*55
 
 	end
 	def tallyElectorials(states)
