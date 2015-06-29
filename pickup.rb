@@ -1,3 +1,4 @@
+###### Gem I used to take an hash of keys and probabilities. and when the .pick method is called it returns one element out of that hash based off a probability.
 class Pickup
   VERSION = "0.0.11"
 end

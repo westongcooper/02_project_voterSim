@@ -3,6 +3,10 @@
 require "./02_project_methods"
 require "./gen_voters"
 require "./pickup"
+require "./0203_project_vote_methods"
+class System 
+end #put this here because System class is a ancestor of Person and Politician.  It game me an error if I required the class Person and Class Politician before I define the System Class
+require "./02_project_people&politicians" 
 
 
 class System
@@ -22,7 +26,7 @@ class System
 	end
 
 	def menu
-		task = question("What would you like to do? 'Create', 'List', 'Update', 'Vote',or 'Exit'")
+		task = question("What would you like to do? 'Create', 'List', 'Update', 'Vote', or 'Exit'")
 		case task
 			when "Create"
 				create #method to start creating a Politician or Person
@@ -73,14 +77,14 @@ class System
 	def list(sortLastName = nil,sortBy = 'Name')#By default asks how to sort.  When passed sortLastName it skips the question and sorts by Name
 		puts `clear`,"\n"*3
 		sortBy = question("How would you like to sort your voter list? 'Name', 'State', or political 'Side'") unless sortLastName
-		@voterList.sort! { |a,b| a.sortList(sortBy).downcase <=> b.sortList(sortBy).downcase } #sorts list based of sortBy question
+		@voterList.sort! { |a,b| a.sortList(sortBy).downcase <=> b.sortList(sortBy).downcase } #compares consecutive items sorts list based of sortBy question
 		puts "Last Name, First Name   | Voter Side          | Voter State         | Voter Type","="*86
 		@voterList.each do |voter|#calls method to display names
 			displayNamesInOrder(voter)
 		end
 	end
 
-	def sortList(sortBy)
+	def sortList(sortBy) #refactored the list method to determin which way to sort the list
 		case sortBy
 		when 'Name'
 			@lName
@@ -93,237 +97,44 @@ class System
 
 	def updateWhat
 		puts `clear`
-		list('Name')
+		list('Name')#sorts list my Name and displays it
 		puts "\n\n"
 		match = nil
 		begin
-			name = openQuestion("Who do you want to change? Give me 'First Name' 'Last Name'","stay").strip.squeeze(" ")
-			@voterList.each_with_index do |voter,index| 
+			name = openQuestion("Who do you want to change? Give me 'First Name' 'Last Name'","stay").strip.squeeze(" ")#asks what name to change
+			@voterList.each_with_index do |voter,index| #scans the voterList to see if what was typed is included in list
 				match = index if name == voter.Name.downcase.capitalize
 			end
 			puts "\n\nThat name was not found.\n\n" if !match
-		end until match
-		voter = @voterList[match]
+		end until match #loops until a match was found
+		voter = @voterList[match] #sets match to voter variable
 		puts `clear`,"\n\n#{voter.Name} - #{voter.Side} - #{voter.State}\n\n"
-		what = question("What do you want to change? 'Name', 'Political side', or 'State'?","stay")
-		updateNow(voter,what)
+		what = question("What do you want to change? 'Name', 'Political side', or 'State'?","stay") #returns what you want to change
+		updateNow(voter,what) #calls updateNow method and sends what needs to be changed and what to change
 	end
 
-	def updateNow(voter,what)
+	def updateNow(voter,what) #arguments: who needs to be changed and what should be changed
 		case what
 		when "Name"
-			changeName(voter)
+			changeName(voter) #calls method to change name
 		when "Political side"
-			voter.changeViews
+			voter.changeViews #calls Voter class (Person, or Politician) method to change views
 		when "State"
-			voter.State = question("What state is this voter? \n\n#{statesList}")
+			voter.State = question("What state is this voter? \n\n#{statesList}")#changes state of voter
 		end
 	end
 
-	def changeName(voter)
-		name = get_Name(voter.voterType)
-		voter.fName = name[0]
-		voter.lName = name[1]
-		voter.Name = "#{name[0]} #{name[1]}"
-	end
-
-	def beginPrimary
-		puts "-"*55
-		puts "-"*55
-		@democratCandidates = []
-		@republicanCandidates = []
-		@democratPrimaryVotes = []
-		@republicanPrimaryVotes = []
-		@voterList.each {|voter|
-			if voter.Side == 'Republican'
-				@republicanCandidates << voter.Name
-			elsif voter.Side == 'Democrat'
-				@democratCandidates << voter.Name
-			end
-		}
-		@voterList.each {|voter| 
-			case voter.Side 
-			when ('Liberal' || 'Socialist' || 'Democrat')
-				@democratPrimaryVotes << @democratCandidates.sample
-			when ('Conservative' || 'Tea party' || 'Republican')
-				@republicanPrimaryVotes << @republicanCandidates.sample
-			end
-		}
-		@democratPrimaryTally = tally(@democratPrimaryVotes)
-		@republicanPrimaryTally = tally(@republicanPrimaryVotes)
-		@dTally = 0
-		@rTally = 0
-		@democratPrimaryTally.each {|name,tallyP|
-			if tallyP > @dTally
-				@democratPrimaryWinner = name 
-				@dTally = tallyP
-			end
-		}
-		@republicanPrimaryTally.each {|name,tallyP|
-			if tallyP > @rTally
-				@republicanPrimaryWinner = name 
-				@rTally = tallyP
-			end
-		}
-
-		puts "\nDemocrat primary Winner: #{@democratPrimaryWinner}\n"
-		puts "\nRepublican primary Winner: #{@republicanPrimaryWinner}\n"
-	end
-
-	def beginVote
-		@votes = []
-		@voterList.each { |voter| getVotes(voter)}
-		tallyVotes
-	end
-
-	def getVotes (voter)
-		case voter.Side 
-		when 'Liberal'
-			addVoter(voter.State,25)
-		when 'Conservative'
-			addVoter(voter.State,75)
-		when 'Tea party'
-			addVoter(voter.State,90)
-		when 'Socialist'
-			addVoter(voter.State,10)
-		when 'Neutral'
-			addVoter(voter.State,50)
-		when 'Republican'
-			addVoter(voter.State,100)
-		when 'Democrat'
-			addVoter(voter.State,0)
-		end
-	end
-
-	def addVoter(state,percent)
-
-		if rand(100) < percent 
-			@votes << ['Republican',state] 
-		else
-			@votes << ['Democrat',state]
-		end
-	end
-
-	def tallyVotes
-		@republicanVote = []
-		@democratVote = []
-		@votes.each { |vote| 
-			if vote[0] == 'Democrat'
-				@democratVote << vote[1]
-			else
-				@republicanVote << vote[1]
-			end
-		}
-		@democratVoteTally = tally(@democratVote)
-		@republicanVoteTally = tally(@republicanVote)
-		republicanWinners = []
-		democratWinners = []
-		@democratVoteTally.each {|dState,dTally|
-			@republicanVoteTally.each {|rState,rTally|
-				if (dState == rState && dTally > rTally)
-					democratWinners << dState
-				elsif (dState == rState && rTally >= dTally)
-					republicanWinners << rState
-				end
-			}
-		}
-		puts "-"*55
-		puts "Democrat Party wins the Electorial Votes for these states:"
-		puts "-"*20
-		democratWinners.each {|state|
-			puts state
-		}
-		puts "\nRepublican Party wins the Electorial Votes for these states:"
-		puts "-"*20
-		republicanWinners.each {|state|
-			puts state
-		}
-		puts "-"*55
-
-		puts "Democrat: ",democratElectorials = tallyElectorials(democratWinners),"\n\n"
-		puts "Republican: ",republicanElectorials = tallyElectorials(republicanWinners),"\n"
-		if democratElectorials > republicanElectorials
-			puts "The Democrat Party wins the Electorial vote!\n\n"
-			@winner = @democratPrimaryWinner
-		else 
-			puts "The Republican Party wins the Electorial vote!\n\n"
-			@winner = @republicanPrimaryWinner
-		end
-		puts "-"*55
-		puts "\nRepublican = #{@republicanVote.length} votes", "Democrat  = #{@democratVote.length} votes\n"
-		print @republicanVote.length > @democratVote.length ? "Republican" : "Democrat"," party wins the popular vote!\n\n"
-		puts "-"*55
-		puts "#{@winner} is the winner of the election!"
-		puts "-"*55
-		puts "-"*55
-
-	end
-
-	def tallyElectorials(states)
-		electorialCount = 0
-		states.each {|state|
-			stateElectorials.each {|stateE,electorials|
-				if state == stateE
-					electorialCount += electorials
-				end
-			}
-		}
-		electorialCount
-	end
-
-	def tally (votes)
-		tally = Hash.new(0)
-
-		votes.each { |vote|
-		  tally[vote] += 1
-		}
-		tally
-	end
-end
-
-class Politician < System
-	attr_accessor :voterType,:fName,:lName, :Side, :Name,:State,:PoliticianList
-	@@PoliticianList = []
-	def initialize(fName,lName,side,state)
-		@voterType = "Politician"
-		@fName = fName
-		@lName = lName
-		@Name = "#{fName} #{lName}"
-		@Side = side
-		@State = state
-		@@PoliticianList << self
-	end
-	def changeViews#(person)
-		@Side = question("What political side are campainging for? 'Republican' or 'Democrat'")
-	end
-	def self.getPoliticians
-		@@PoliticianList
-	end
-end
-
-class Person < System
-	attr_accessor :voterType,:fName,:lName, :Side,:Name,:State,:PeopleList
-	@@PeopleList = []
-	def initialize(fName,lName,side,state)
-		@voterType = "Person"
-		@fName = fName
-		@lName = lName
-		@Name = "#{fName} #{lName}"
-		@Side = side
-		@State = state
-		@@PeopleList << self
-	end
-	def changeViews#(person)
-		@Side = question("What political side are your views? 'Liberal', 'Conservative', 'Tea party', 'Socialist', or 'Neutral'")
-	end
-	def self.getPeople
-		@@PeopleList
+	def changeName(voter) 
+		name = get_Name(voter.voterType) #calls pervious get_name method to change Name
+		voter.fName = name[0] #change voter fName
+		voter.lName = name[1] #change voter lName
+		voter.Name = "#{name[0]} #{name[1]}" #combine fName and Lname to change Name
 	end
 end
 
 begin #Loop to restart campaign if you want
-campaign = System.new
-again = question("Do you want to start a new campagin? 'Y' or 'N'")
+System.new #intiate the campagin
+again = question("Do you want to start a new campagin? 'Y' or 'N'") #new campagin?
 end until again == 'N'
 
 
