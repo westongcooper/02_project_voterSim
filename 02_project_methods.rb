@@ -18,7 +18,9 @@ def question(question,stay = nil)
 			puts "Sorry, not valid response\n"
 			puts "="*75
 		end
-	end until question.include? answer
+		# options.each {|option|
+		# }
+	end until options.include? answer 
 end
 
 def openQuestion(question,stay = nil)
@@ -38,6 +40,18 @@ def openQuestion(question,stay = nil)
 	end #until yORn == 'Y'
 	answer.downcase.capitalize
 end
+
+def openNumberQuestion(question,number)
+	puts `clear`
+	begin
+		answer = ""
+		puts question
+		answer = gets.chomp while answer.empty?
+		puts `clear`
+	end until (answer.is_i? && answer.to_i <= number)
+	answer.to_i
+end
+
 def displayConfirmation
 	puts "\n"*5,"#{" "*30}Processing!"
 	sleep(Loadtime)
@@ -48,12 +62,46 @@ def displayConfirmation
 	end until continue
 	menu
 end
+
 def enterToContinue
-			begin
+		begin
 			puts "\n\nPress enter to return to continue"
 			continue = gets.chomp
 		end until continue
 end
+
 def states
-statesList = "'Alabama''Alaska''Arizona''Arkansas''California'\n'Colorado''Connecticut''Delaware''District of Columbia''Florida'\n'Georgia''Hawaii''Idaho''Illinois''Indiana''Iowa''Kansas''Kentucky'\n'Louisiana''Maine''Montana''Nebraska''Nevada''New Hampshire'\n'New Jersey''New Mexico''New York''North Carolina''North Dakota''Ohio'\n'Oklahoma''Oregon''Maryland''Massachusetts''Michigan''Minnesota'\n'Mississippi''Missouri''Pennsylvania''Rhode Island''South Carolina'\n'South Dakota''Tennessee''Texas''Utah''Vermont''Virginia''Washington'\n'West Virginia''Wisconsin''Wyoming'"
+	statesList = "'Alabama''Alaska''Arizona''Arkansas''California'\n'Colorado''Connecticut''Delaware''District of Columbia''Florida'\n'Georgia''Hawaii''Idaho''Illinois''Indiana''Iowa''Kansas''Kentucky'\n'Louisiana''Maine''Montana''Nebraska''Nevada''New Hampshire'\n'New Jersey''New Mexico''New York''North Carolina''North Dakota''Ohio'\n'Oklahoma''Oregon''Maryland''Massachusetts''Michigan''Minnesota'\n'Mississippi''Missouri''Pennsylvania''Rhode Island''South Carolina'\n'South Dakota''Tennessee''Texas''Utah''Vermont''Virginia''Washington'\n'West Virginia''Wisconsin''Wyoming'"
+end
+
+
+def gen_people(number)
+	completePercent = 0
+	print "\n"*8," "*20,"Loading...\n\n"
+	number.times do |i|
+		@voterList << Person.new(random_fNames, random_lNames, random_Person,random_State)
+		complete = ((i/number.to_f*55).to_i)+1
+		if completePercent != complete
+			print "*"
+			completePercent = complete
+		end
+		#print "*"*(i/number.to_f)
+	end
+	print "\n"*3," "*20,"  Done!"
+	sleep(1)
+end
+
+def gen_politicians(number)
+	number.times do
+		@voterList << Politician.new(random_fNames, random_lNames, random_Politician,random_State)
+	end
+end
+
+class String
+    def is_i?
+       !!(self =~ /\A[-+]?[0-9]+\z/)
+    end
+    def to_1
+    	/^[^\0]*/
+    end
 end
