@@ -1,4 +1,6 @@
 # 02_project_people&politicians.rb
+class System 
+end #put this here because System class is a ancestor of Person and Politician.  It game me an error if I required the class Person and Class Politician before I define the System Class
 class Politician < System #A class for each Politician
 	attr_accessor :voterType,:fName,:lName, :Side, :Name,:State,:PoliticianList
 	@@PoliticianList = []
