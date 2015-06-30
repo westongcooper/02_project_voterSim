@@ -4,8 +4,6 @@ require "./02_project_methods"
 require "./gen_voters"
 require "./pickup"
 require "./0203_project_vote_methods"
-class System 
-end #put this here because System class is a ancestor of Person and Politician.  It game me an error if I required the class Person and Class Politician before I define the System Class
 require "./02_project_people&politicians" 
 
 
